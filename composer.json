@@ -1,8 +1,8 @@
 {
-    "name"       : "yoast/i18n-module",
-    "description": "Handle i18n for WordPress plugins.",
+    "name"       : "wpbp/i18n-notice",
+    "description": "Handle i18n for plugins, based on Yoast i18n-module ",
     "keywords"   : ["wordpress"],
-    "homepage"   : "https://github.com/Yoast/i18n-module",
+    "homepage"   : "https://github.com/WPBP/i18n-notice",
     "license"    : "GPL-2.0-or-later",
     "authors"    : [
         {
@@ -12,18 +12,14 @@
         }
     ],
     "support"    : {
-        "issues": "https://github.com/Yoast/i18n-module/issues",
-        "source": "https://github.com/Yoast/i18n-module"
+        "issues": "https://github.com/WPBP/i18n-notice/issues",
+        "source": "https://github.com/WPBP/i18n-notice"
     },
     "autoload"   : {
         "classmap": ["src/"]
     },
     "require": {
-        "php": ">=5.6"
-    },
-    "require-dev": {
-        "roave/security-advisories": "dev-master",
-        "yoast/yoastcs": "^2.2.1"
+        "php": ">=7.1"
     },
     "config": {
         "allow-plugins": {
@@ -32,19 +28,4 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "scripts": {
-        "lint": [
-            "@php ./vendor/php-parallel-lint/php-parallel-lint/parallel-lint . -e php --show-deprecated --exclude vendor --exclude node_modules --exclude .git"
-        ],
-        "config-yoastcs" : [
-            "Dealerdirect\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run",
-            "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs --config-set default_standard Yoast"
-        ],
-        "check-cs": [
-            "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs"
-        ],
-        "fix-cs": [
-            "@php ./vendor/squizlabs/php_codesniffer/bin/phpcbf"
-        ]
-    }
 }

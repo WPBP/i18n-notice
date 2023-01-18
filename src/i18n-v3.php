@@ -1,15 +1,15 @@
 <?php
 /**
- * Yoast I18n module.
+ * WPBP I18n notice.
  *
- * @package Yoast\I18n-module
+ * @package WPBP\I18n-notice
  */
 
 /**
  * This class defines a promo box and checks your translation site's API for stats about it,
  * then shows them to the user.
  */
-class Yoast_I18n_v3 {
+class I18n_Notice {
 
 	/**
 	 * Your translation site's logo.
@@ -180,11 +180,11 @@ class Yoast_I18n_v3 {
 	 * @return bool
 	 */
 	private function hide_promo() {
-		$hide_promo = get_option( 'yoast_i18n_' . $this->project_slug . '_promo_hide' );
+		$hide_promo = get_option( 'i18n_notice_' . $this->project_slug . '_promo_hide' );
 		if ( ! $hide_promo ) {
 			if ( filter_input( INPUT_GET, 'remove_i18n_promo', FILTER_VALIDATE_INT ) === 1 ) {
 				// No expiration time, so this would normally not expire, but it wouldn't be copied to other sites etc.
-				update_option( 'yoast_i18n_' . $this->project_slug . '_promo_hide', true );
+				update_option( 'i18n_notice_' . $this->project_slug . '_promo_hide', true );
 				$hide_promo = true;
 			}
 		}
@@ -294,11 +294,11 @@ class Yoast_I18n_v3 {
 	 * @return object|null
 	 */
 	private function find_or_initialize_translation_details() {
-		$set = get_option( 'yoast_i18n_' . $this->project_slug . '_' . $this->locale );
+		$set = get_option( 'i18n_notice_' . $this->project_slug . '_' . $this->locale );
 
 		if ( ! $set ) {
 			$set = $this->retrieve_translation_details();
-			update_option( 'yoast_i18n_' . $this->project_slug . '_' . $this->locale, $set );
+			update_option( 'i18n_notice_' . $this->project_slug . '_' . $this->locale, $set );
 		}
 
 		return $set;
@@ -339,7 +339,7 @@ class Yoast_I18n_v3 {
 	}
 
 	/**
-	 * Retrieve the translation details from Yoast Translate.
+	 * Retrieve the translation details from Custom GlotPress instance.
 	 *
 	 * @return object|null
 	 */
@@ -378,7 +378,7 @@ class Yoast_I18n_v3 {
 	}
 
 	/**
-	 * Set the needed private variables based on the results from Yoast Translate.
+	 * Set the needed private variables based on the results from GlotPress Instance.
 	 *
 	 * @param object $set The translation set.
 	 */

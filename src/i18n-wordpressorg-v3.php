@@ -1,19 +1,19 @@
 <?php
 /**
- * Yoast I18n module.
+ * WPBP I18n notice.
  *
- * @package Yoast\I18n-module
+ * @package WPBP\I18n-notice
  */
 
 /**
- * The Yoast i18n module with a connection to WordPress.org.
+ * The i18n module with a connection to WordPress.org.
  */
-class Yoast_I18n_WordPressOrg_v3 {
+class I18n_Notice_WordPressOrg {
 
 	/**
 	 * The i18n object that presents the user with the notification.
 	 *
-	 * @var yoast_i18n_v3
+	 * @var I18n_Notice
 	 */
 	protected $i18n;
 
@@ -28,7 +28,7 @@ class Yoast_I18n_WordPressOrg_v3 {
 	public function __construct( $args, $show_translation_box = true ) {
 		$args = $this->set_defaults( $args );
 
-		$this->i18n = new Yoast_I18n_v3( $args, $show_translation_box );
+		$this->i18n = new I18n_Notice( $args, $show_translation_box );
 		$this->set_api_url( $args['textdomain'] );
 	}
 
