@@ -110,6 +110,16 @@ class I18n_Notice {
 	private $translation_loaded;
 
 	/**
+	 * Capability a user needs to dismiss the promo box.
+	 *
+	 * Dismissing hides the box for every user on the site, so it is restricted
+	 * to users who can manage the site's options by default.
+	 *
+	 * @var string
+	 */
+	private $dismiss_capability = 'manage_options';
+
+	/**
 	 * Class constructor.
 	 *
 	 * @param array $args                 Contains the settings for the class.
@@ -181,14 +191,63 @@ class I18n_Notice {
 	 */
 	private function hide_promo() {
 		$hide_promo = get_option( 'i18n_notice_' . $this->project_slug . '_promo_hide' );
-		if ( ! $hide_promo ) {
-			if ( filter_input( INPUT_GET, 'remove_i18n_promo', FILTER_VALIDATE_INT ) === 1 ) {
-				// No expiration time, so this would normally not expire, but it wouldn't be copied to other sites etc.
-				update_option( 'i18n_notice_' . $this->project_slug . '_promo_hide', true );
-				$hide_promo = true;
-			}
+		if ( ! $hide_promo && $this->is_dismiss_request() ) {
+			update_option( 'i18n_notice_' . $this->project_slug . '_promo_hide', true );
+			$hide_promo = true;
 		}
 		return $hide_promo;
+	}
+
+	/**
+	 * Checks whether the current request is a valid request to dismiss the promo box.
+	 *
+	 * The request must carry the dismiss parameter, a valid nonce, and come from
+	 * a user with the dismiss capability.
+	 *
+	 * @return bool
+	 */
+	private function is_dismiss_request() {
+		if ( filter_input( INPUT_GET, 'remove_i18n_promo', FILTER_VALIDATE_INT ) !== 1 ) {
+			return false;
+		}
+
+		if ( ! $this->current_user_can_dismiss() ) {
+			return false;
+		}
+
+		$nonce = filter_input( INPUT_GET, '_wpnonce' );
+		if ( ! is_string( $nonce ) || $nonce === '' ) {
+			return false;
+		}
+
+		return wp_verify_nonce( $nonce, $this->get_dismiss_nonce_action() ) !== false;
+	}
+
+	/**
+	 * Checks whether the current user is allowed to dismiss the promo box.
+	 *
+	 * @return bool
+	 */
+	private function current_user_can_dismiss() {
+		return current_user_can( $this->dismiss_capability );
+	}
+
+	/**
+	 * Returns the nonce action used for dismissing the promo box.
+	 *
+	 * @return string
+	 */
+	private function get_dismiss_nonce_action() {
+		return 'i18n_notice_dismiss_' . $this->project_slug;
+	}
+
+	/**
+	 * Returns the URL that dismisses the promo box.
+	 *
+	 * @return string
+	 */
+	private function get_dismiss_url() {
+		return wp_nonce_url( add_query_arg( [ 'remove_i18n_promo' => '1' ] ), $this->get_dismiss_nonce_action() );
 	}
 
 	/**
@@ -257,10 +316,14 @@ class I18n_Notice {
 	 * @return string
 	 */
 	public function get_dismiss_i18n_message_button() {
+		if ( ! $this->current_user_can_dismiss() ) {
+			return '';
+		}
+
 		return sprintf(
 			/* translators: %1$s is the notification dismissal link start tag, %2$s is the link closing tag. */
 			esc_html__( '%1$sPlease don\'t show me this notification anymore%2$s', $this->textdomain ),
-			'<a class="button" href="' . esc_url( add_query_arg( [ 'remove_i18n_promo' => '1' ] ) ) . '">',
+			'<a class="button" href="' . esc_url( $this->get_dismiss_url() ) . '">',
 			'</a>'
 		);
 	}
@@ -273,7 +336,9 @@ class I18n_Notice {
 
 		if ( $message ) {
 			echo '<div id="i18n_promo_box" style="border:1px solid #ccc;background-color:#fff;padding:10px;max-width:650px; overflow: hidden;">';
-			echo '<a href="' . esc_url( add_query_arg( [ 'remove_i18n_promo' => '1' ] ) ) . '" style="color:#333;text-decoration:none;font-weight:bold;font-size:16px;border:1px solid #ccc;padding:1px 4px;" class="alignright">X</a>';
+			if ( $this->current_user_can_dismiss() ) {
+				echo '<a href="' . esc_url( $this->get_dismiss_url() ) . '" style="color:#333;text-decoration:none;font-weight:bold;font-size:16px;border:1px solid #ccc;padding:1px 4px;" class="alignright">X</a>';
+			}
 
 			echo '<div>';
 			/* translators: %s: plugin name. */

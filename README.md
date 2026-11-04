@@ -101,3 +101,20 @@ $i18n_module = new I18n_Notice_WordPressOrg(
 
 $message = $i18n_module->get_promo_message();
 ```
+
+### Dismissing the message
+
+The promo box has a dismiss link. Dismissing hides the message for every user on the site, so only users with the `manage_options` capability can do it, and the request must carry a valid nonce. Users without the capability still see the message, but without the dismiss link.
+
+To let users with a different capability dismiss the message, pass `dismiss_capability`:
+
+```php
+new I18n_Notice(
+	array(
+		// ... the arguments shown above ...
+		'dismiss_capability' => 'edit_posts',
+	)
+);
+```
+
+When you render the message yourself, use `get_dismiss_i18n_message_button()` for the dismiss link. A link you build yourself with only `?remove_i18n_promo=1` is ignored, because it has no nonce.
